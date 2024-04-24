@@ -1,0 +1,34 @@
+name: oasys
+description: "A new Flutter project."
+publish_to: "none" # Dihapus jika Anda ingin mempublikasikannya ke pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  http: ^0.13.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Asset
+  assets:
+    - assets/images/headersection.png
+    - assets/images/oasys-logo.png
+    - assets/images/onboarding.png
+
+  # Anda bisa menambahkan custom fonts di sini jika diperlukan
+  fonts:
+    - family: poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
