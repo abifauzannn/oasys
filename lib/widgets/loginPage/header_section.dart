@@ -7,7 +7,7 @@ class HeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.only(top: 30), // Padding kanan dan kiri
+        padding: const EdgeInsets.only(top: 20), // Padding kanan dan kiri
         child: Row(
           // Row untuk mengelompokkan gambar dan teks
           mainAxisAlignment: MainAxisAlignment.center, // Pusatkan elemen secara vertikal

@@ -8,19 +8,30 @@ class Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Mendapatkan ukuran layar
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end, // Mulai dari akhir (bawah)
-          children: const [
-            HeaderSection(
-              image: 'assets/images/oasys-logo.png',
-            ),
-            OnboardingSection(
-              image: 'assets/images/onboarding.png',
-            ),
-            ButtonSection(),
-          ],
+        child: Container(
+          height: screenHeight, // Mengatur tinggi container sesuai dengan tinggi layar
+          width: screenWidth,
+          
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,  // Menempatkan widget di ujung bawah
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HeaderSection(
+                image: 'assets/images/oasys-logo.png',
+              ),
+              OnboardingSection(
+                image: 'assets/images/onboarding.png',
+              ),
+              ButtonSection(),
+            ],
+          ),
         ),
       ),
     );

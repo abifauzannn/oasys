@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'screens/splash.dart';
 import 'screens/login_page.dart';
 import 'screens/forget_password.dart';
+import 'screens/home_page.dart';
+import 'screens/main_screen.dart';
 
 void main() => runApp(const MyApp());
 
