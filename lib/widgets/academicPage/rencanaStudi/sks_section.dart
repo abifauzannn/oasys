@@ -1,24 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/models/rencana_studi.dart';
+import 'package:oasys/api/auth_api.dart';
 
 class SksInformation extends StatelessWidget {
   const SksInformation({Key? key}) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
+    return FutureBuilder<AcademicRencanaStudi?>(
+      future: AuthApi.getRencanaStudi(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final sks = snapshot.data!;
+          return _buildSksInformation(context, sks);
+        } else {
+          return Text('No data available');
+        }
+      },
+    );
+  }
+
+  Widget _buildSksInformation(BuildContext context, AcademicRencanaStudi sks) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Row(
       children: [
-        Flexible(child: SksDiambil()),
-        SizedBox(width: 7),
-         Flexible(child: SksSelesai()),
-         SizedBox(width: 7),
-          Flexible(child: TotalSks()), // Spasi antara kolom
+        Flexible(
+            child: SksDiambil(sks: sks.rencanaStudiInfo.sksDiAmbil.toString())),
+        SizedBox(width: screenWidth * 0.01),
+        Flexible(child: SksSelesai( sks: sks.rencanaStudiInfo.sksSelesai.toString())),
+        SizedBox(width: screenWidth * 0.01),
+        Flexible(child: TotalSks(sks: sks.rencanaStudiInfo.sksTotal.toString())), // Spasi antara kolom
       ],
     );
   }
 }
 
 class SksDiambil extends StatelessWidget {
-  const SksDiambil({Key? key}) : super(key: key);
+  const SksDiambil({Key? key, required this.sks}) : super(key: key);
+  final String sks;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +72,7 @@ class SksDiambil extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '21',
+                  sks,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -67,7 +90,8 @@ class SksDiambil extends StatelessWidget {
 }
 
 class SksSelesai extends StatelessWidget {
-  const SksSelesai({Key? key}) : super(key: key);
+  const SksSelesai({Key? key, required this.sks}) : super(key: key);
+  final String sks;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +123,7 @@ class SksSelesai extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '74',
+                  sks,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -116,7 +140,8 @@ class SksSelesai extends StatelessWidget {
 }
 
 class TotalSks extends StatelessWidget {
-  const TotalSks({Key? key}) : super(key: key);
+  const TotalSks({Key? key, required this.sks}) : super(key: key);
+  final String sks;
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +173,7 @@ class TotalSks extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '127',
+                  sks,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,

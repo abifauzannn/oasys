@@ -14,6 +14,8 @@ class HomePage extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    // print('Building HomePage...'); // Menampilkan pesan di konsol saat membangun halaman
+
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,

@@ -1,16 +1,35 @@
 import 'package:flutter/material.dart';
+import '../../api/auth_api.dart';
+import '../../models/homepage.dart';
 
 class StatusAkademik extends StatelessWidget {
   const StatusAkademik({Key? key}) : super(key: key);
 
-  @override
   Widget build(BuildContext context) {
+    return FutureBuilder<HomePage?>(
+      future: AuthApi.getHomePage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final header = snapshot.data!;
+          return _buildStatus(context, header);
+        } else {
+          return Text('No data available');
+        }
+      },
+    );
+  }
+
+  Widget _buildStatus(BuildContext context, HomePage header) {
     return Expanded(
       child: Row(
         children: [
-          Expanded(child: StatusKRS()),
+          Expanded(child: StatusKRS( status: header.statusKrs.namaStatusKrs)),
           SizedBox(width: 10), // Spasi antara kolom
-          Expanded(child: StatusKHS()),
+          Expanded(child: StatusKHS( status: header.statusKhs.namaStatusKhs)),
         ],
       ),
     );
@@ -18,7 +37,9 @@ class StatusAkademik extends StatelessWidget {
 }
 
 class StatusKRS extends StatelessWidget {
-  const StatusKRS({Key? key}) : super(key: key);
+  const StatusKRS({Key? key, required this.status}) : super(key: key);
+
+  final String status;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +73,7 @@ class StatusKRS extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Telah Di acc',
+                  '${status}',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -75,7 +96,9 @@ class StatusKRS extends StatelessWidget {
 }
 
 class StatusKHS extends StatelessWidget {
-  const StatusKHS({Key? key}) : super(key: key);
+  const StatusKHS({Key? key, this.status}) : super(key: key);
+
+  final String? status;
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +132,7 @@ class StatusKHS extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Belum Tersedia',
+                  '${status}',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
