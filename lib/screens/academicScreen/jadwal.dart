@@ -18,7 +18,7 @@ class Jadwal  extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.03),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01, horizontal: screenWidth * 0.03),
               child: SingleChildScrollView( // Tambahkan SingleChildScrollView di sini
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

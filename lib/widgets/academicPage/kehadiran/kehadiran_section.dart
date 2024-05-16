@@ -1,10 +1,88 @@
 import 'package:flutter/material.dart';
-class KehadiranTab extends StatelessWidget {
+import 'package:oasys/models/kehadiran.dart';
+import 'package:oasys/api/auth_api.dart';
+
+class KehadiranTab extends StatefulWidget {
   const KehadiranTab({Key? key}) : super(key: key);
 
-  Widget periodeAkademmik() {
+  @override
+  _KehadiranTabState createState() => _KehadiranTabState();
+}
+
+class _KehadiranTabState extends State<KehadiranTab> {
+  late Future<Kehadiran?> _kehadiranFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _kehadiranFuture = AuthApi.getKehadiran();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Kehadiran?>(
+      future: _kehadiranFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final kehadiran = snapshot.data!;
+          return _buildList(context, kehadiran);
+        } else {
+          return NoKehadiran();
+        }
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, Kehadiran kehadiran) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              periodeAkademmik(kehadiran.semesterAktif.tahunAwal,
+                  kehadiran.semesterAktif.tahunAkhir),
+              Divider(
+                color: Colors.grey.withOpacity(0.3),
+                thickness: 1,
+                height: 20,
+                indent: 0,
+                endIndent: 0,
+              ),
+              listTitle(context),
+              SizedBox(height: screenHeight * 0.01),
+              Column(
+                children: kehadiran.daftarKehadiran.map((kehadiranDetail) {
+                  return Column(
+                    children: [
+                      InfoMataKuliah(kehadiranDetail: kehadiranDetail),
+                      SizedBox(height: screenHeight * 0.01),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget periodeAkademmik(String tahunMasuk, String tahunAkhir) {
     return Text(
-      'Periode 23/24 - Genap',
+      'Periode $tahunMasuk/$tahunAkhir',
       style: TextStyle(
         fontFamily: 'Poppins',
         fontSize: 14,
@@ -14,7 +92,8 @@ class KehadiranTab extends StatelessWidget {
     );
   }
 
-  Widget listTitle() {
+  Widget listTitle(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -27,7 +106,7 @@ class KehadiranTab extends StatelessWidget {
             color: Colors.grey,
           ),
         ),
-        SizedBox(width: 10), // Tambahkan spasi antara teks
+        SizedBox(width: screenWidth * 0.01), // Tambahkan spasi antara teks
         Text(
           'Kehadiran',
           style: TextStyle(
@@ -40,93 +119,61 @@ class KehadiranTab extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget infoKehadiran() {
+
+class InfoMataKuliah extends StatelessWidget {
+  final KehadiranDetail kehadiranDetail;
+
+  const InfoMataKuliah({Key? key, required this.kehadiranDetail})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Algoritma Pemrograman',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+            Flexible(
+              child: Text(
+                kehadiranDetail.namaMatkul,
+                overflow: TextOverflow
+                    .fade, // Jika teks melebihi, maka akan memudar di bagian akhirnya
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
               ),
             ),
-            SizedBox(width: 10), // Tambahkan spasi antara teks
+            SizedBox(width: screenWidth * 0.128),
             Text(
-              '100%',
+              kehadiranDetail.presentaseKehadiran + '%',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: int.parse(kehadiranDetail.presentaseKehadiran) <= 50
+                    ? Colors.red
+                    : Colors.black,
               ),
             ),
           ],
         ),
-        SizedBox(height: 3),
-        Text('5/5 Pertemuan',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-            ))
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0),
-      child: SingleChildScrollView( // Tambahkan SingleChildScrollView di sini
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                periodeAkademmik(),
-                Divider(
-                  color: Colors.grey.withOpacity(0.3),
-                  thickness: 1,
-                  height: 20,
-                  indent: 0,
-                  endIndent: 0,
-                ),
-                // listTitle(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                // infoKehadiran(),
-                // SizedBox(height: screenHeight * 0.02),
-                NoKehadiran(), // Tambahkan widget NoKehadiran pada akhir
-              ],
-            ),
+        Text(
+          '${kehadiranDetail.jumlahHadir}/${kehadiranDetail.jumlahTotal} Pertemuan',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 10,
+            fontWeight: FontWeight.normal,
           ),
         ),
-      ),
+      ],
     );
   }
 }

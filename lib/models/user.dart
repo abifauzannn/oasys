@@ -29,6 +29,7 @@ class UserProfile {
   final String studyProgram;
   final String faculty;
   final String username;
+  final String photoNew;
 
   UserProfile({
     required this.photo, // Provide a non-null default value
@@ -38,6 +39,7 @@ class UserProfile {
     required this.studyProgram,
     required this.faculty,
     required this.username,
+    required this.photoNew,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,7 @@ class UserProfile {
       studyProgram: detailData['program_studi'] ?? '',
       faculty: detailData['fakultas'] ?? '',
       username: detailData['username'] ?? '',
+      photoNew: profileData['foto_new'] ?? '',
     );
   }
 }

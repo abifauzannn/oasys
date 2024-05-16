@@ -1,24 +1,49 @@
 import 'package:flutter/material.dart';
 import '../../api/auth_api.dart';
-import '../../models/user.dart'; // Using the UserProfile model that was previously created
+import '../../models/user.dart'; 
 
-class FormProfile extends StatelessWidget {
+class FormProfile extends StatefulWidget {
   const FormProfile({Key? key}) : super(key: key);
+
+  @override
+  _FormProfileState createState() => _FormProfileState();
+}
+
+class _FormProfileState extends State<FormProfile> {
+  late Future<UserProfile?> _profileFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileFuture = AuthApi.getProfile();
+  }
+
+  Future<void> _refreshProfile() async {
+    setState(() {
+      _profileFuture = AuthApi.getProfile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<UserProfile?>(
-      future: AuthApi.getProfile(),
+      future: _profileFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
         } else if (snapshot.hasData && snapshot.data != null) {
           final profile = snapshot.data!;
           return _buildProfileForm(context, profile);
         } else {
-          return Text('No data available');
+          return Center(
+            child: Text('No data available'),
+          );
         }
       },
     );
@@ -26,7 +51,6 @@ class FormProfile extends StatelessWidget {
 
   Widget _buildProfileForm(BuildContext context, UserProfile profile) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
       child: Column(
@@ -52,7 +76,6 @@ class TahunMasuk extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,13 +83,20 @@ class TahunMasuk extends StatelessWidget {
         Text(
           'Tahun Masuk',
           style: TextStyle(
-              fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+            fontFamily: 'Poppins',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         SizedBox(height: screenHeight * 0.01),
         TextFormField(
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+          initialValue: tahunMasuk,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
-            hintText: tahunMasuk,
             filled: true,
             fillColor: const Color(0xFFF6F7FA),
             border: OutlineInputBorder(
@@ -86,6 +116,9 @@ class TahunMasuk extends StatelessWidget {
     );
   }
 }
+
+// Implement ProgramStudi, Fakultas, and Username similarly as TahunMasuk
+
 
 class ProgramStudi extends StatelessWidget {
   final String programStudi;

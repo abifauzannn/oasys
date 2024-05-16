@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.05),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.03),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

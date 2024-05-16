@@ -1,26 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/models/nilai.dart';
+import 'package:oasys/api/auth_api.dart';
 
-class SksInformation extends StatelessWidget {
+class SksInformation extends StatefulWidget {
   const SksInformation({Key? key}) : super(key: key);
 
   @override
+  _SksInformationState createState() => _SksInformationState();
+}
+
+class _SksInformationState extends State<SksInformation> {
+  late Future<Nilai?> _nilaiFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _nilaiFuture = AuthApi.getNilai();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return FutureBuilder<Nilai?>(
+      future: _nilaiFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final nilai = snapshot.data!;
+          return _buildSksInformation(context, nilai);
+        } else {
+          return Text('No data available');
+        }
+      },
+    );
+  }
+
+  Widget _buildSksInformation(BuildContext context, Nilai nilai) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Row(
       children: [
-        Flexible(child: TotalIpk()),
+        Flexible(
+          child: TotalIpk(ipk: nilai.penilaianInfo.ipk.toDouble()),
+        ),
         SizedBox(width: screenWidth * 0.02),
-        Flexible(child: TotalIps()),
+        Flexible(
+          child: TotalIps(totalIps: nilai.penilaianInfo.ips.toDouble()),
+        ),
         SizedBox(width: screenWidth * 0.02),
-        Flexible(child: NilaiRata()), // Spasi antara kolom
+        Flexible(
+          child: NilaiRata(nilai: nilai.penilaianInfo.nilaiRata),
+        ),
       ],
     );
   }
 }
 
-class TotalIpk extends StatelessWidget {
-  const TotalIpk({Key? key}) : super(key: key);
+// Other Widget classes remain unchanged...
 
+
+class TotalIpk extends StatelessWidget {
+  const TotalIpk({Key? key, required this.ipk}) : super(key: key);
+  final double ipk;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,7 +92,7 @@ class TotalIpk extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '3.87',
+                  '$ipk',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -68,7 +110,8 @@ class TotalIpk extends StatelessWidget {
 }
 
 class TotalIps extends StatelessWidget {
-  const TotalIps({Key? key}) : super(key: key);
+  const TotalIps({Key? key, required this.totalIps}) : super(key: key);
+  final double totalIps;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +143,7 @@ class TotalIps extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '3.66',
+                  '$totalIps',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -117,7 +160,8 @@ class TotalIps extends StatelessWidget {
 }
 
 class NilaiRata extends StatelessWidget {
-  const NilaiRata({Key? key}) : super(key: key);
+  const NilaiRata({Key? key, required this.nilai}) : super(key: key);
+  final int nilai;
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +192,7 @@ class NilaiRata extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '-',
+                  '$nilai',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/api/auth_api.dart';
 
 class FormSection extends StatefulWidget {
   const FormSection({Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class FormSection extends StatefulWidget {
 class _FormSectionState extends State<FormSection> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -69,33 +71,55 @@ class _FormSectionState extends State<FormSection> {
   }
 
   Widget buildResetButton() {
-    return ElevatedButton(
-      onPressed: handleResetButtonPressed,
-      child: const Text('Send Reset Link'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 9, 78, 134),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
-        textStyle: const TextStyle(
-          fontFamily: 'poppins',
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-        minimumSize: const Size(double.infinity, 0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        shadowColor: Colors.black.withOpacity(0.2),
-        elevation: 5,
-      ),
-    );
+    return _isLoading
+        ? CircularProgressIndicator() // Show a loading indicator if _isLoading is true
+        : ElevatedButton(
+            onPressed: handleResetButtonPressed,
+            child: const Text('Send Reset Link'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 9, 78, 134),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
+              textStyle: const TextStyle(
+                fontFamily: 'poppins',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              minimumSize: const Size(double.infinity, 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              shadowColor: Colors.black.withOpacity(0.2),
+              elevation: 5,
+            ),
+          );
   }
 
-  void handleResetButtonPressed() {
+  void handleResetButtonPressed() async {
     String? emailError = validateEmail(_emailController.text);
+
     if (emailError == null) {
-      showSuccessSnackBar();
-    } else {
+      // Set _isLoading menjadi true saat memulai proses login
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Call API for login
+      final forgetResult = await AuthApi.forgetPassword(
+        _emailController.text,
+      );
+
+      // Setelah mendapatkan respons dari API, set _isLoading menjadi false
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (forgetResult.reset_token.isNotEmpty) {
+        showSuccessSnackBar();
+      } else {
+        showEmailErrorSnackBar(forgetResult.message);
+      }
+    } else if (emailError != null) {
       showEmailErrorSnackBar(emailError);
     }
   }
@@ -115,7 +139,8 @@ class _FormSectionState extends State<FormSection> {
           children: [
             const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: 20),
-            Column(
+            Expanded(
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -137,7 +162,7 @@ class _FormSectionState extends State<FormSection> {
                   ),
                 ),
               ],
-            )
+            ))
           ],
         ),
       ),

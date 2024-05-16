@@ -1,11 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/models/nilai.dart';
+import 'package:oasys/api/auth_api.dart';
 
-class DetailNilai extends StatelessWidget {
-  const DetailNilai ({Key? key}) : super(key: key);
+class DetailNilai extends StatefulWidget {
+  const DetailNilai({Key? key}) : super(key: key);
 
-  Widget periodeAkademmik() {
+  @override
+  _DetailNilaiState createState() => _DetailNilaiState();
+}
+
+class _DetailNilaiState extends State<DetailNilai> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Nilai?>(
+      future: AuthApi.getNilai(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final nilai = snapshot.data!;
+          return _buildList(context, nilai);
+        } else {
+          return NoNilai();
+        }
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, Nilai nilai) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              periodeAkademmik(nilai.semesterAktif.tahunAwal, nilai.semesterAktif.tahunAkhir),
+              Divider(
+                color: Colors.grey.withOpacity(0.3),
+                thickness: 1,
+                height: 20,
+                indent: 0,
+                endIndent: 0,
+              ),
+              listTitle(),
+              SizedBox(height: screenHeight * 0.01),
+              Column(
+                children: nilai.penilaian.map((nilai) {
+                  return Column(
+                    children: [
+                      InfoMataKuliah(matkul: nilai), // Widget InfoMataKuliah
+                      SizedBox(
+                          height: screenHeight *
+                              0.01), // Jarak vertikal antara setiap widget InfoMataKuliah
+                    ],
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget periodeAkademmik(String tahunMasuk, String tahunAkhir) {
     return Text(
-      'Periode 23/24 - Genap',
+      'Periode $tahunMasuk/$tahunAkhir',
       style: TextStyle(
         fontFamily: 'Poppins',
         fontSize: 14,
@@ -42,15 +113,16 @@ class DetailNilai extends StatelessWidget {
     );
   }
 
-  Widget InfoMataKuliah() {
-    return const Column(
+  Widget InfoMataKuliah({required NilaiDetail matkul}) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Flexible(child: 
             Text(
-              'Algoritma Pemrograman',
+              '${matkul.namaMatkul}',
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 14,
@@ -58,9 +130,10 @@ class DetailNilai extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
+            ), 
             SizedBox(width: 10), // Tambahkan spasi antara teks
             Text(
-              'A',
+              '${matkul.hurufIndeks}',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Poppins',
@@ -71,58 +144,14 @@ class DetailNilai extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 3),
-        Text('4 MKU 710 - Smt 4',
+        SizedBox(height: 1),
+        Text('${matkul.kodeMatkul} - ${matkul.sksMatkul} SKS',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 10,
               fontWeight: FontWeight.w600,
             ))
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            periodeAkademmik(),
-            Divider(
-              color: Colors.grey.withOpacity(
-                  0.3), // Memberikan opacity 50% pada warna abu-abu
-              thickness: 1,
-              height: 20,
-              indent: 0,
-              endIndent: 0,
-            ),
-            // listTitle(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            // SizedBox(height: screenHeight * 0.02),
-            // InfoMataKuliah(),
-            NoNilai(),
-          ]),
-        ),
-      ),
     );
   }
 }
@@ -156,8 +185,7 @@ class NoNilai extends StatelessWidget {
             ),
           ),
           SizedBox(height: screenHeight * 0.03),
-          Text(
-              'Sepertinya daftar nilai kamu belum tersedia untuk saat ini ',
+          Text('Sepertinya daftar nilai kamu belum tersedia untuk saat ini ',
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 14,

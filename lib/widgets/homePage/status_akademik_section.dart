@@ -2,22 +2,48 @@ import 'package:flutter/material.dart';
 import '../../api/auth_api.dart';
 import '../../models/homepage.dart';
 
-class StatusAkademik extends StatelessWidget {
+class StatusAkademik extends StatefulWidget {
   const StatusAkademik({Key? key}) : super(key: key);
 
+  @override
+  _StatusAkademikState createState() => _StatusAkademikState();
+}
+
+class _StatusAkademikState extends State<StatusAkademik> {
+  late Future<HomePage?> _homePageFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _homePageFuture = AuthApi.getHomePage();
+  }
+
+  Future<void> _refreshHomePage() async {
+    setState(() {
+      _homePageFuture = AuthApi.getHomePage();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<HomePage?>(
-      future: AuthApi.getHomePage(),
+      future: _homePageFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
         } else if (snapshot.hasData && snapshot.data != null) {
           final header = snapshot.data!;
           return _buildStatus(context, header);
         } else {
-          return Text('No data available');
+          return Center(
+            child: Text('No data available'),
+          );
         }
       },
     );
@@ -27,9 +53,9 @@ class StatusAkademik extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          Expanded(child: StatusKRS( status: header.statusKrs.namaStatusKrs)),
+          Expanded(child: StatusKRS(status: header.statusKrs.namaStatusKrs)),
           SizedBox(width: 10), // Spasi antara kolom
-          Expanded(child: StatusKHS( status: header.statusKhs.namaStatusKhs)),
+          Expanded(child: StatusKHS(status: header.statusKhs.namaStatusKhs)),
         ],
       ),
     );
@@ -46,7 +72,7 @@ class StatusKRS extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey[100],
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -105,7 +131,7 @@ class StatusKHS extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey[100],
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(

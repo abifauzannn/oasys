@@ -2,13 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:oasys/models/rencana_studi.dart';
 import 'package:oasys/api/auth_api.dart';
 
-class SksInformation extends StatelessWidget {
+class SksInformation extends StatefulWidget {
   const SksInformation({Key? key}) : super(key: key);
+
+  @override
+  _SksInformationState createState() => _SksInformationState();
+}
+
+class _SksInformationState extends State<SksInformation> {
+  late Future<AcademicRencanaStudi?> _sksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _sksFuture = AuthApi.getRencanaStudi();
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<AcademicRencanaStudi?>(
-      future: AuthApi.getRencanaStudi(),
+      future: _sksFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -29,15 +42,16 @@ class SksInformation extends StatelessWidget {
     return Row(
       children: [
         Flexible(
-            child: SksDiambil(sks: sks.rencanaStudiInfo.sksDiAmbil.toString())),
+          child: SksDiambil(sks: sks.rencanaStudiInfo.sksDiAmbil.toString())),
         SizedBox(width: screenWidth * 0.01),
-        Flexible(child: SksSelesai( sks: sks.rencanaStudiInfo.sksSelesai.toString())),
+        Flexible(child: SksSelesai(sks: sks.rencanaStudiInfo.sksSelesai.toString())),
         SizedBox(width: screenWidth * 0.01),
-        Flexible(child: TotalSks(sks: sks.rencanaStudiInfo.sksTotal.toString())), // Spasi antara kolom
+        Flexible(child: TotalSks(sks: sks.rencanaStudiInfo.sksTotal.toString())),
       ],
     );
   }
 }
+
 
 class SksDiambil extends StatelessWidget {
   const SksDiambil({Key? key, required this.sks}) : super(key: key);
@@ -98,7 +112,7 @@ class SksSelesai extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -148,7 +162,7 @@ class TotalSks extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(

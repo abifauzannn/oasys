@@ -2,24 +2,53 @@ import 'package:flutter/material.dart';
 import '../../api/auth_api.dart';
 import '../../models/homepage.dart';
 
-class ProfilAkademikSection extends StatelessWidget {
+class ProfilAkademikSection extends StatefulWidget {
   const ProfilAkademikSection({Key? key}) : super(key: key);
 
+  @override
+  _ProfilAkademikSectionState createState() => _ProfilAkademikSectionState();
+}
+
+class _ProfilAkademikSectionState extends State<ProfilAkademikSection> {
+  late Future<HomePage?> _homePageFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _homePageFuture = AuthApi.getHomePage();
+  }
+
+  Future<void> _refreshHomePage() async {
+    setState(() {
+      _homePageFuture = AuthApi.getHomePage();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<HomePage?>(
-      future: AuthApi.getHomePage(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData && snapshot.data != null) {
-          final header = snapshot.data!;
-          return _buildProfilAkademik(context, header);
-        } else {
-          return Text('No data available');
-        }
-      },
+    return RefreshIndicator(
+      onRefresh: _refreshHomePage,
+      child: FutureBuilder<HomePage?>(
+        future: _homePageFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (snapshot.hasData && snapshot.data != null) {
+            final header = snapshot.data!;
+            return _buildProfilAkademik(context, header);
+          } else {
+            return Center(
+              child: Text('No data available'),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -28,20 +57,23 @@ class ProfilAkademikSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Container(
+        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            jenjangAkademik(header.programStudi.programStudi),
-            SizedBox(height: screenHeight * 0.01),
-            dosenWali(header.dosenWali.dosenWali),
-            SizedBox(height: screenHeight * 0.01),
-            dosenPembimbing(header.dosenPembimbing.dosenPembimbing),
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              jenjangAkademik(header.programStudi.programStudi),
+              SizedBox(height: screenHeight * 0.01),
+              dosenWali(header.dosenWali.dosenWali),
+              SizedBox(height: screenHeight * 0.01),
+              dosenPembimbing(header.dosenPembimbing.dosenPembimbing),
+            ],
+          ),
         ),
       ),
     );
@@ -140,7 +172,3 @@ Widget dosenPembimbing(String dosenPembimbing) {
     ],
   );
 }
-
-
-
-

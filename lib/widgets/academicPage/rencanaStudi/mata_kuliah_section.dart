@@ -2,13 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:oasys/models/rencana_studi.dart';
 import 'package:oasys/api/auth_api.dart';
 
-class MataKuliah extends StatelessWidget {
+class MataKuliah extends StatefulWidget {
   const MataKuliah({Key? key}) : super(key: key);
+
+  @override
+  _MataKuliahState createState() => _MataKuliahState();
+}
+
+class _MataKuliahState extends State<MataKuliah> {
+  late Future<AcademicRencanaStudi?> _rencanaStudiFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _rencanaStudiFuture = AuthApi.getRencanaStudi();
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<AcademicRencanaStudi?>(
-      future: AuthApi.getRencanaStudi(),
+      future: _rencanaStudiFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -26,13 +39,12 @@ class MataKuliah extends StatelessWidget {
 
   Widget _buildList(BuildContext context, AcademicRencanaStudi rencanaStudi) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
@@ -110,6 +122,7 @@ class MataKuliah extends StatelessWidget {
   }
 }
 
+
 class InfoMataKuliah extends StatelessWidget {
   final DaftarMatkul matkul;
 
@@ -124,7 +137,6 @@ class InfoMataKuliah extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               child: Text(
@@ -176,7 +188,6 @@ class NoMataKuliah extends StatelessWidget {
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
             'assets/images/noresult.png',

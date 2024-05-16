@@ -1,58 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/models/jadwal.dart';
+import 'package:oasys/api/auth_api.dart';
 
-class JadwalTab extends StatelessWidget {
+class JadwalTab extends StatefulWidget {
   const JadwalTab({Key? key}) : super(key: key);
 
   @override
+  _JadwalTabState createState() => _JadwalTabState();
+}
+
+class _JadwalTabState extends State<JadwalTab> {
+  @override
   Widget build(BuildContext context) {
-    // Mengambil ukuran layar
+    return FutureBuilder<Jadwal?>(
+      future: AuthApi.getJadwal(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final jadwal = snapshot.data!;
+          return _buildList(context, jadwal);
+        } else {
+          return Text('data');
+        }
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, Jadwal jadwal) {
+    final Map<String, List<JadwalDetail>> jadwalPerHari = {};
+    jadwal.daftarJadwal.forEach((jadwalDetail) {
+      final hari = jadwalDetail.namaHari;
+      jadwalPerHari.putIfAbsent(hari, () => []);
+      jadwalPerHari[hari]!.add(jadwalDetail);
+    });
+
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Container(
-            width: screenWidth, // Lebar kontainer sama dengan lebar layar
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: jadwalPerHari.entries.map((entry) {
+          final hari = entry.key;
+          final daftarJadwal = entry.value;
+
+          // Cek apakah daftar jadwal kosong atau tidak terdapat nama mata kuliah
+          if (daftarJadwal.isEmpty || !daftarJadwal.any((jadwal) => jadwal.namaMatkul.isNotEmpty)) {
+            return Column(
               children: [
-                ListJadwal(),
-                SizedBox(height: screenHeight * 0.02),
-                ListJadwal(),
-                SizedBox(height: screenHeight * 0.02),
-                NoJadwal(),
-                SizedBox(height: screenHeight * 0.02),
-                ListJadwal(),
-                SizedBox(height: screenHeight * 0.02),
-                NoJadwal(),
+                SizedBox(height: screenHeight * 0.01), // Jarak antara hari-hari
+                _buildEmptySchedule(screenWidth, screenHeight, hari),
               ],
-            ),
-          ),
-        ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: screenHeight * 0.01), // Jarak antara hari-hari
+              _buildNonEmptySchedule(screenWidth, screenHeight, hari, daftarJadwal),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
-}
 
-// Widget untuk menampilkan nama hari dan garis pembatas
-class NamaHari extends StatelessWidget {
-  const NamaHari({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Mengambil ukuran layar
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
+  Widget _buildEmptySchedule(
+    double screenWidth, double screenHeight, String hari) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Baris untuk menampilkan nama hari
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
               'assets/images/calendar.png',
@@ -62,7 +88,7 @@ class NamaHari extends StatelessWidget {
             ),
             SizedBox(width: screenWidth * 0.02),
             Text(
-              'SENIN',
+              '$hari'.toUpperCase(),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -71,216 +97,163 @@ class NamaHari extends StatelessWidget {
             ),
           ],
         ),
-        // Garis pembatas antara hari dan jadwal
         Divider(
           color: Colors.grey.withOpacity(0.3),
           thickness: 1,
           height: 20,
         ),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Text(
+              'TIDAK ADA JADWAL',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNonEmptySchedule(double screenWidth, double screenHeight,
+      String hari, List<JadwalDetail> daftarJadwal) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Image.asset(
+              'assets/images/calendar.png',
+              width: screenWidth * 0.06,
+              height: screenHeight * 0.04,
+              fit: BoxFit.cover,
+            ),
+            SizedBox(width: screenWidth * 0.02),
+            Text(
+              '$hari'.toUpperCase(),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        Divider(
+          color: Colors.grey.withOpacity(0.3),
+          thickness: 1,
+          height: 20,
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: daftarJadwal.length,
+          itemBuilder: (context, index) {
+            final jadwalDetail = daftarJadwal[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: JadwalCard(jadwalDetail: jadwalDetail),
+            );
+          },
+        ),
       ],
     );
   }
 }
 
-// Widget untuk menampilkan informasi kelas
-class InformasiKelas extends StatelessWidget {
-  const InformasiKelas({Key? key}) : super(key: key);
+class JadwalCard extends StatelessWidget {
+  final JadwalDetail jadwalDetail;
+
+  const JadwalCard({Key? key, required this.jadwalDetail}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil ukuran layar
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
     return Container(
-      width: screenWidth,
-      child: Column(
-        children: [
-          // Baris untuk menampilkan informasi kelas
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '4 MKU 710 - R.091',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.02,
-                  vertical: screenHeight * 0.001,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '08.00 - 10.00 WIB',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Widget untuk menampilkan informasi mata kuliah
-class InformasiMataKuliah extends StatelessWidget {
-  const InformasiMataKuliah({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Mengambil ukuran layar
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Text(
-      'Algoritma Pemrograman',
-      style: TextStyle(
-        fontFamily: 'Poppins',
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-      ),
-    );
-  }
-}
-
-class InformasiDosen extends StatelessWidget {
-  const InformasiDosen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      Image.asset(
-        'assets/images/user.png',
-        width: screenWidth * 0.04,
-        height: screenHeight * 0.03,
-        fit: BoxFit.cover,
-      ),
-      SizedBox(width: screenWidth * 0.02),
-      Text(
-        'Prof. Dr. Sunandar, M.Sc.',
-        style: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Colors.black,
-        ),
-      )
-    ]);
-  }
-}
-
-// Widget untuk menampilkan satu kartu jadwal
-class CardJadwal extends StatelessWidget {
-  const CardJadwal({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Mengambil ukuran layar
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Container(
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
       width: screenWidth,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01, horizontal: screenWidth * 0.02),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Informasi kelas
-            InformasiKelas(),
-            // Informasi mata kuliah
-            SizedBox(height: screenHeight * 0.006),
-            InformasiMataKuliah(),
-            SizedBox(height: screenHeight * 0.006),
-            InformasiDosen(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${jadwalDetail.idRuangan}',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.02,
+                    vertical: screenHeight * 0.001,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${jadwalDetail.jamKuliah}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Text(
+              '${jadwalDetail.namaMatkul}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Image.asset(
+                  'assets/images/user.png',
+                  width: screenWidth * 0.04,
+                  height: screenHeight * 0.03,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(width: screenWidth * 0.02),
+                Text(
+                  '${jadwalDetail.namaDosen}',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
           ],
         ),
       ),
-    );
-  }
-}
-
-class TextNoJadwal extends StatelessWidget {
-  const TextNoJadwal({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Tidak ada jadwal',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey,
-        ),
-      ),
-    );
-  }
-}
-
-// Widget untuk menampilkan daftar jadwal
-class ListJadwal extends StatelessWidget {
-  const ListJadwal({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Mengambil ukuran layar
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Nama hari dan garis pembatas
-        NamaHari(),
-        // Satu kartu jadwal
-        CardJadwal(),
-      ],
-    );
-  }
-}
-
-class NoJadwal extends StatelessWidget {
-  const NoJadwal({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Mengambil ukuran layar
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Nama hari dan garis pembatas
-        NamaHari(),
-        // Satu kartu jadwal
-        TextNoJadwal(),
-      ],
     );
   }
 }
