@@ -52,6 +52,7 @@ class _MataKuliahState extends State<MataKuliah> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              
               periodeAkademmik(rencanaStudi.semesterAktif.tahunAwal,
                   rencanaStudi.semesterAktif.tahunAkhir),
               Divider(

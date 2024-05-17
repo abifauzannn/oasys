@@ -18,13 +18,14 @@ class _KehadiranTabState extends State<KehadiranTab> {
     _kehadiranFuture = AuthApi.getKehadiran();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Kehadiran?>(
       future: _kehadiranFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return _buildBlinkingImage();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData && snapshot.data != null) {
@@ -36,6 +37,31 @@ class _KehadiranTabState extends State<KehadiranTab> {
       },
     );
   }
+
+ Widget _buildBlinkingImage() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center, // Memposisikan widget ke tengah layar secara vertikal
+    children: [
+      TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        duration: Duration(milliseconds: 500),
+        builder: (context, value, child) {
+          return Opacity(
+            opacity: value,
+            child: child, // Widget 'child' dimasukkan ke dalam Opacity
+          );
+        },
+        child: Image.asset(
+          'assets/images/oasys-logo.png',
+          height: 100,
+          width: 100,
+        ),
+      ),
+    ],
+  );
+}
+
+
 
   Widget _buildList(BuildContext context, Kehadiran kehadiran) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -120,7 +146,6 @@ class _KehadiranTabState extends State<KehadiranTab> {
     );
   }
 }
-
 
 class InfoMataKuliah extends StatelessWidget {
   final KehadiranDetail kehadiranDetail;

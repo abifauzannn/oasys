@@ -26,6 +26,7 @@ class HomePage {
       dosenPembimbing: DosenPembimbing.fromJson(json['dosen_pembimbing']),
       statusKrs: StatusKrs.fromJson(json['status_krs']),
       statusKhs: StatusKhs.fromJson(json['status_khs']),
+
     );
   }
 }
@@ -48,7 +49,7 @@ class InfoMahasiswa {
       id: json['id'],
       nama: json['nama'],
       nim: json['nim'],
-      ipk: json['ipk'].toDouble(),
+      ipk: json['ipk'],
     );
   }
 }

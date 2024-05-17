@@ -67,7 +67,7 @@ class _AkademikSectionState extends State<AkademikSection> {
               namaSemester: header.semesterAktif.namaSemester,
               tahunAwal: header.semesterAktif.tahunAwal,
               tahunAkhir: header.semesterAktif.tahunAkhir),
-          IpkUser(ipk: header.infoMahasiswa.ipk),
+          IpkUser(ipk: header.infoMahasiswa.ipk.toDouble()),
         ],
       ),
     );
@@ -141,7 +141,7 @@ class IpkUser extends StatelessWidget {
             ),
           ),
           Text(
-            '${ipk.toStringAsFixed(2)}',
+            '${ipk}',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,

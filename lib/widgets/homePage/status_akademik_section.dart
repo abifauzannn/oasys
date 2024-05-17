@@ -50,11 +50,12 @@ class _StatusAkademikState extends State<StatusAkademik> {
   }
 
   Widget _buildStatus(BuildContext context, HomePage header) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Expanded(
       child: Row(
         children: [
           Expanded(child: StatusKRS(status: header.statusKrs.namaStatusKrs)),
-          SizedBox(width: 10), // Spasi antara kolom
+          SizedBox(width: screenWidth * 0.01), // Spasi antara kolom
           Expanded(child: StatusKHS(status: header.statusKhs.namaStatusKhs)),
         ],
       ),
@@ -99,21 +100,25 @@ class StatusKRS extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${status}',
+                  '$status',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(width: screenWidth * 0.01),
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 20,
-                ),
+                if (status !=
+                    'Belum Mengajukan')
+                    
+                     // Menampilkan ikon hanya jika status tidak sama dengan "Belum Mengajukan"
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 16,
+                  ),
               ],
-            ),
+            )
           ],
         ),
       ),
@@ -161,7 +166,7 @@ class StatusKHS extends StatelessWidget {
                   '${status}',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: 13,
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
