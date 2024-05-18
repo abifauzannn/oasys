@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/screens/information_page.dart';
 import 'screens/splash.dart';
 import 'screens/login_page.dart';
 import 'screens/forget_password.dart';
 import 'screens/home_page.dart';
 import 'screens/main_screen.dart';
+import 'screens/screen1.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './api/auth_api.dart';
 
@@ -36,7 +38,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: homePage ?? Splash(), // Set SplashScreen as default if homePage is not provided
+      home: homePage ??
+          Splash(), // Set SplashScreen as default if homePage is not provided
       routes: {
         '/login': (context) => LoginPage(),
         '/forgetPassword': (context) => ForgetPassword(),
@@ -47,6 +50,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

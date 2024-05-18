@@ -15,7 +15,7 @@ class DetailPage extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        // Mengembalikan nilai true agar sistem dapat menutup aplikasi
+        Navigator.pop(context);
         return false;
       },
       child: Scaffold(

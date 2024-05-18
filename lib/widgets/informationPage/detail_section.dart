@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oasys/models/pengumuman.dart';
-import 'package:oasys/widgets/forgetPassword/button_section.dart'; 
+import 'package:oasys/widgets/forgetPassword/button_section.dart';
 import 'package:flutter_html/flutter_html.dart';
 // Pastikan Anda mengganti path sesuai dengan struktur proyek Anda
-
-import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 
 class DetailInformation extends StatelessWidget {
   final PengumumanDetail pengumumanDetail;
@@ -25,7 +21,7 @@ class DetailInformation extends StatelessWidget {
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
-            // Mengembalikan nilai true agar sistem dapat menutup aplikasi
+            Navigator.pop(context);
             return false;
           },
           child: SingleChildScrollView(
@@ -44,8 +40,6 @@ class DetailInformation extends StatelessWidget {
   }
 }
 
-
-
 class BannerInformation extends StatelessWidget {
   const BannerInformation({Key? key}) : super(key: key);
 
@@ -63,9 +57,11 @@ class BannerInformation extends StatelessWidget {
 }
 
 class TitleInformation extends StatelessWidget {
-  final PengumumanDetail pengumumanDetail; // Menerima pengumumanDetail sebagai parameter
+  final PengumumanDetail
+      pengumumanDetail; // Menerima pengumumanDetail sebagai parameter
 
-  const TitleInformation({Key? key, required this.pengumumanDetail}) : super(key: key);
+  const TitleInformation({Key? key, required this.pengumumanDetail})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +76,7 @@ class TitleInformation extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
           child: Text(
             pengumumanDetail.judul,
-             // Gunakan judul dari pengumumanDetail
+            // Gunakan judul dari pengumumanDetail
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 16,
@@ -109,9 +105,11 @@ class TitleInformation extends StatelessWidget {
 }
 
 class BodyInformation extends StatelessWidget {
-  final PengumumanDetail pengumumanDetail; // Menerima pengumumanDetail sebagai parameter
+  final PengumumanDetail
+      pengumumanDetail; // Menerima pengumumanDetail sebagai parameter
 
-  const BodyInformation({Key? key, required this.pengumumanDetail}) : super(key: key);
+  const BodyInformation({Key? key, required this.pengumumanDetail})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
