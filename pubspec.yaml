@@ -28,26 +28,27 @@ flutter:
 
   # Asset
   assets:
-    - assets/images/headersection.png
-    - assets/images/oasys-logo.png
-    - assets/images/onboarding.png
-    - assets/images/carousel.png
-    - assets/images/noresult.png
-    - assets/images/calendar.png
-    - assets/images/user.png
-    - assets/images/khs.png
-    - assets/images/krs.png
-    - assets/images/bannerinformation.png
-    - assets/images/userprofile.png
-    - assets/images/star.png
-    - assets/images/award.png
-    - assets/images/logout.png
-    - assets/svg/menu.svg
-    - assets/svg/discovery.svg
-    - assets/svg/profile.svg
-    - assets/svg/message.svg
-    - assets/svg/award.svg
-    - assets/svg/calendar.svg
+    - assets/images/
+    - assets/svg/
+    # - assets/images/oasys-logo.png
+    # - assets/images/onboarding.png
+    # - assets/images/carousel.png
+    # - assets/images/noresult.png
+    # - assets/images/calendar.png
+    # - assets/images/user.png
+    # - assets/images/khs.png
+    # - assets/images/krs.png
+    # - assets/images/bannerinformation.png
+    # - assets/images/userprofile.png
+    # - assets/images/star.png
+    # - assets/images/award.png
+    # - assets/images/logout.png
+    # - assets/svg/menu.svg
+    # - assets/svg/discovery.svg
+    # - assets/svg/profile.svg
+    # - assets/svg/message.svg
+    # - assets/svg/award.svg
+    # - assets/svg/calendar.svg
 
   # Anda bisa menambahkan custom fonts di sini jika diperlukan
   fonts:

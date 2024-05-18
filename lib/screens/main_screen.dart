@@ -278,8 +278,7 @@ class DetailInformation extends StatelessWidget {
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context);
-            return false;
+            return true;
           },
           child: Padding(
             padding: EdgeInsets.symmetric(

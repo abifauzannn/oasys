@@ -20,7 +20,6 @@ class TabbarExample extends StatefulWidget {
   State<TabbarExample> createState() => _TabbarExampleState();
 }
 
-
 class _TabbarExampleState extends State<TabbarExample> {
   @override
   Widget build(BuildContext context) {
@@ -63,7 +62,7 @@ class _TabbarExampleState extends State<TabbarExample> {
             // Isi untuk Tab 2
             Kehadiran(),
             // Isi untuk Tab 3
-           Jadwal(),
+            Jadwal(),
             // Isi untuk Tab 4
             InformasiNilai(),
           ],

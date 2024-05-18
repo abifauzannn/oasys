@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:oasys/theme/theme.dart';
+import 'package:oasys/widgets/customWidget.dart';
 import '../../api/auth_api.dart';
-import '../../models/user.dart'; 
+import '../../models/user.dart';
 
 class FormProfile extends StatefulWidget {
   const FormProfile({Key? key}) : super(key: key);
@@ -11,6 +13,10 @@ class FormProfile extends StatefulWidget {
 
 class _FormProfileState extends State<FormProfile> {
   late Future<UserProfile?> _profileFuture;
+  TextEditingController tahunMasukController = TextEditingController();
+  TextEditingController programStudiController = TextEditingController();
+  TextEditingController fakultasController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
 
   @override
   void initState() {
@@ -22,6 +28,15 @@ class _FormProfileState extends State<FormProfile> {
     setState(() {
       _profileFuture = AuthApi.getProfile();
     });
+  }
+
+  @override
+  void dispose() {
+    tahunMasukController.dispose();
+    programStudiController.dispose();
+    fakultasController.dispose();
+    usernameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,6 +54,10 @@ class _FormProfileState extends State<FormProfile> {
           );
         } else if (snapshot.hasData && snapshot.data != null) {
           final profile = snapshot.data!;
+          tahunMasukController.text = profile.entryYear.toString();
+          programStudiController.text = profile.studyProgram;
+          fakultasController.text = profile.faculty;
+          usernameController.text = profile.username;
           return _buildProfileForm(context, profile);
         } else {
           return Center(
@@ -55,13 +74,32 @@ class _FormProfileState extends State<FormProfile> {
     return Container(
       child: Column(
         children: [
-          TahunMasuk(tahunMasuk: profile.entryYear.toString()),
+          CustomTextFormField(
+            title: 'Tahun Masuk',
+            controller: tahunMasukController,
+          ),
           SizedBox(height: screenHeight * 0.02),
-          ProgramStudi(programStudi: profile.studyProgram),
+          CustomTextFormField(
+            title: 'Program Studi',
+            controller: programStudiController,
+          ),
           SizedBox(height: screenHeight * 0.02),
-          Fakultas(fakultas: profile.faculty),
+          CustomTextFormField(
+            title: 'Fakultas',
+            controller: fakultasController,
+          ),
           SizedBox(height: screenHeight * 0.02),
-          Username(username: profile.username),
+          CustomTextFormField(
+            title: 'Username',
+            controller: usernameController,
+          ),
+          // TahunMasuk(tahunMasuk: profile.entryYear.toString()),
+          // SizedBox(height: screenHeight * 0.02),
+          // ProgramStudi(programStudi: profile.studyProgram),
+          // SizedBox(height: screenHeight * 0.02),
+          // Fakultas(fakultas: profile.faculty),
+          // SizedBox(height: screenHeight * 0.02),
+          // Username(username: profile.username),
         ],
       ),
     );
@@ -82,35 +120,13 @@ class TahunMasuk extends StatelessWidget {
       children: [
         Text(
           'Tahun Masuk',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: style1,
         ),
         SizedBox(height: screenHeight * 0.01),
         TextFormField(
           initialValue: tahunMasuk,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFFF6F7FA),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Colors.black),
-            ),
-            labelStyle: const TextStyle(
-              color: Colors.black45,
-            ),
-          ),
+          style: style1,
+          decoration: decoration1,
         ),
       ],
     );
@@ -118,7 +134,6 @@ class TahunMasuk extends StatelessWidget {
 }
 
 // Implement ProgramStudi, Fakultas, and Username similarly as TahunMasuk
-
 
 class ProgramStudi extends StatelessWidget {
   final String programStudi;
@@ -140,7 +155,8 @@ class ProgramStudi extends StatelessWidget {
         ),
         SizedBox(height: screenHeight * 0.01),
         TextFormField(
-         style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: programStudi,
             filled: true,
@@ -169,7 +185,7 @@ class Fakultas extends StatelessWidget {
   const Fakultas({Key? key, required this.fakultas}) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -183,7 +199,8 @@ class Fakultas extends StatelessWidget {
         ),
         SizedBox(height: screenHeight * 0.01),
         TextFormField(
-           style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: fakultas,
             filled: true,
@@ -212,7 +229,7 @@ class Username extends StatelessWidget {
   const Username({Key? key, required this.username}) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
@@ -228,7 +245,8 @@ class Username extends StatelessWidget {
         ),
         SizedBox(height: screenHeight * 0.01),
         TextFormField(
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: username, // Tambahkan placeholder di sini
             filled: true,
